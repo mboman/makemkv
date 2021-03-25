@@ -3,7 +3,7 @@ MAINTAINER Michael Boman <michael@michaelboman.org>
 
 RUN dnf update -qy && \
     dnf install -qy dnf-plugins-core sudo && \
-    dnf config-manager --add-repo=http://negativo17.org/repos/fedora-multimedia.repo && \
+    dnf config-manager --add-repo=https://negativo17.org/repos/fedora-multimedia.repo && \
     dnf install -qy makemkv && \
     dnf clean all && \
     sudo useradd -s /sbin/nologin -G cdrom mkv && \
