@@ -120,7 +120,7 @@ catch_failed () {
 # Run makemkvcon. In a function for job control in rip.sh. Function should always be run in the background.
 run_makemkvcon () {
     trap - ERR  # Disable error trap here to avoid firing error hooks twice.
-    sudo -u mkv LD_PRELOAD=/wrappers.so makemkvcon mkv ${DEBUG:+--debug} --progress -same --directio true \
+    sudo -u mkv LD_PRELOAD=/wrappers.so /opt/makemkvcon/bin/makemkvcon mkv ${DEBUG:+--debug} --progress -same --directio true \
         "dev:$DEVNAME" all "$DIR_WORKING" \
         |low_space_term \
         |catch_failed
