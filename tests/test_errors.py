@@ -64,7 +64,7 @@ def test_rip_error(request, tmpdir):
     # Execute.
     output = tmpdir.ensure_dir('output')
     command = ['docker', 'run', '--device=/dev/cdrom', '-v', '{}:/output'.format(output), '-e', 'DEBUG=true',
-               'robpol86/makemkv']
+               'mboman/makemkv']
     master, slave = pty.openpty()
     request.addfinalizer(lambda: [os.close(master), os.close(slave)])
     proc = subprocess.Popen(command, bufsize=1, cwd=HERE, stderr=subprocess.STDOUT, stdin=slave, stdout=subprocess.PIPE)
@@ -93,7 +93,7 @@ def test_no_disc(tmpdir):
     """
     output = tmpdir.ensure_dir('output')
     command = ['docker', 'run', '--device=/dev/sr0', '-v', '{}:/output'.format(output), '-e', 'DEBUG=true',
-               'robpol86/makemkv']
+               'mboman/makemkv']
     pytest.cdunload()
 
     with pytest.raises(subprocess.CalledProcessError) as exc:
@@ -109,7 +109,7 @@ def test_no_device(tmpdir, devname):
     :param str devname: Set DEVNAME to this if truthy.
     """
     output = tmpdir.ensure_dir('output')
-    command = ['docker', 'run', '-v', '{}:/output'.format(output), '-e', 'DEBUG=true', 'robpol86/makemkv']
+    command = ['docker', 'run', '-v', '{}:/output'.format(output), '-e', 'DEBUG=true', 'mboman/makemkv']
     if devname:
         command = command[:-1] + ['-e', 'DEVNAME={}'.format(devname)] + command[-1:]
 

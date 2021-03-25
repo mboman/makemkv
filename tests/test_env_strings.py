@@ -12,7 +12,7 @@ def test_devname(tmpdir, devname):
     :param str devname: Set environment variable to this.
     """
     output = tmpdir.ensure_dir('output')
-    command = ['docker', 'run', '-v', '{}:/output'.format(output), '-e', 'DEBUG=true', 'robpol86/makemkv']
+    command = ['docker', 'run', '-v', '{}:/output'.format(output), '-e', 'DEBUG=true', 'mboman/makemkv']
 
     # Docker acts weird with /dev/cdrom and /dev/sr0 specified at the same time. Workaround:
     if devname == '/dev/sr0':

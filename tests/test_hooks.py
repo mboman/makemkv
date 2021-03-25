@@ -20,7 +20,7 @@ def build_image(root):
 
     # Create Dockerfile.
     docker_file = root.ensure('Dockerfile')
-    docker_file.write('FROM robpol86/makemkv\n')
+    docker_file.write('FROM mboman/makemkv\n')
 
     # Let caller add files or modify Dockerfile.
     yield root, docker_file, images

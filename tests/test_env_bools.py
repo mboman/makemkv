@@ -12,7 +12,7 @@ def test_debug(debug):
 
     :param bool debug: Set environment variable to 'true', 'false', or don't set.
     """
-    command = ['docker', 'run', '--device=/dev/cdrom', 'robpol86/makemkv']
+    command = ['docker', 'run', '--device=/dev/cdrom', 'mboman/makemkv']
     if debug is True:
         command = command[:-1] + ['-e', 'DEBUG=true'] + command[-1:]
     elif debug is False:

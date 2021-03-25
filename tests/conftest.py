@@ -22,7 +22,7 @@ def run(command=None, args=None, output=None, image_id=None, environ=None, cwd=N
     :param iter command: Command to run.
     :param iter args: List of command line arguments to insert to command.
     :param str output: Path to bind mount to /output when `command` is None.
-    :param str image_id: Docker image to use instead of robpol86/makemkv.
+    :param str image_id: Docker image to use instead of mboman/makemkv.
     :param dict environ: Environment variables to set/override in the command.
     :param str cwd: Current working directory. Default is tests directory.
 
@@ -30,7 +30,7 @@ def run(command=None, args=None, output=None, image_id=None, environ=None, cwd=N
     :rtype: tuple
     """
     if command is None:
-        command = ['docker', 'run', '--device=/dev/cdrom', '-e', 'DEBUG=true', image_id or 'robpol86/makemkv']
+        command = ['docker', 'run', '--device=/dev/cdrom', '-e', 'DEBUG=true', image_id or 'mboman/makemkv']
         if output:
             command = command[:-1] + ['-v', '{}:/output'.format(output)] + command[-1:]
     if args:
@@ -122,7 +122,7 @@ def cdunload():
 def container_ids_diff():
     """Find the ID of the container(s) created by "docker run" commands."""
     diff = list()
-    command = ['docker', 'ps', '-aqf', 'ancestor=robpol86/makemkv']
+    command = ['docker', 'ps', '-aqf', 'ancestor=mboman/makemkv']
     old_cids = set(run(command)[0].splitlines())
 
     # Yield to let caller execute "docker run".

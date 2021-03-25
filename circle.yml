@@ -46,7 +46,7 @@ jobs:
 
       - run:
           name: Build Dockerfile
-          command: docker build . -t robpol86/makemkv
+          command: docker build . -t mboman/makemkv
 
       - run:
           name: Run Tests

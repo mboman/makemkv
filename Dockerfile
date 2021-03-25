@@ -1,5 +1,5 @@
 FROM fedora:25
-MAINTAINER Robpol86 <robpol86@gmail.com>
+MAINTAINER Michael Boman <michael@michaelboman.org>
 
 RUN dnf update -qy && \
     dnf install -qy dnf-plugins-core sudo && \

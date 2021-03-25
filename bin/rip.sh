@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run makemkvcon in headless mode to rip DVDs or Blu-rays.
-# https://github.com/Robpol86/makemkv/blob/master/bin/rip.sh
+# https://github.com/mboman/makemkv/blob/master/bin/rip.sh
 # Save as (chmod +x): /rip.sh
 
 set -E  # Call ERR traps when using -e.

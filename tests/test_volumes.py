@@ -15,7 +15,7 @@ def test_volume(tmpdir, volume):
     :param str volume: Configuration to test.
     """
     output = tmpdir.ensure_dir('output')
-    command = ['docker', 'run', '--device=/dev/cdrom', '-e', 'DEBUG=true', 'robpol86/makemkv']
+    command = ['docker', 'run', '--device=/dev/cdrom', '-e', 'DEBUG=true', 'mboman/makemkv']
     if volume == 'bind':
         command = command[:-1] + ['-v', '{}:/output'.format(output)] + command[-1:]
     elif volume == 'data':
