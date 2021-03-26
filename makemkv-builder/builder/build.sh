@@ -115,65 +115,6 @@ PKG_CONFIG_PATH="$BUILD_DIR/fdk-aac/lib/pkgconfig" ./configure \
 make -j$(nproc) install
 
 #
-# Qt
-#
-# NOTE: fontconfig is disabled to avoid potential config files
-#       incompatibilities.  The version used by the builder may differ from the
-#       one used at runtime.
-#
-cd "$BUILD_DIR"
-echo "Downloading qt..."
-mkdir qt-src
-curl -# -L ${QT_URL} | tar -xJ --strip 1 -C qt-src
-echo "Compiling qt..."
-cd qt-src
-# Create the configure options file.
-echo "\
--opensource
--confirm-license
--prefix
-$BUILD_DIR/qt
--sysconfdir
-/etc/xdg
--release
--strip
--ltcg
--no-pch
--nomake
-tools
--nomake
-tests
--nomake
-examples
--sql-sqlite
--no-sql-odbc
--system-zlib
--qt-freetype
--qt-pcre
--qt-libpng
--qt-libjpeg
--qt-xcb
--qt-xkbcommon-x11
--qt-harfbuzz
--qt-sqlite
--no-fontconfig
--no-compile-examples
--no-cups
--no-iconv
--no-opengl
--no-qml-debug
--no-feature-xml
--no-feature-testlib
--no-openssl
-" > config.opt
-# Skip all modules (except qtbase).
-find . -maxdepth 1 -type d -printf "%f\n" | grep qt | grep -v qtbase | xargs -n1 printf "-skip\n%s\n" >> config.opt
-# Run configure with new options.
-./configure -redo
-# Compile.
-make -j$(nproc)
-make -j$(nproc) install
-
 #
 # MakeMKV OSS
 #
@@ -184,7 +125,7 @@ curl -# -L ${MAKEMKV_OSS_URL} | tar -xz --strip 1 -C makemkv-oss
 echo "Compiling MakeMKV OSS..."
 cd makemkv-oss
 patch -p0 < "$SCRIPT_DIR/launch-url.patch"
-DESTDIR="$INSTALL_DIR" PKG_CONFIG_PATH="$BUILD_DIR/ffmpeg/lib/pkgconfig:$BUILD_DIR/qt/lib/pkgconfig" ./configure --prefix=
+DESTDIR="$INSTALL_DIR" PKG_CONFIG_PATH="$BUILD_DIR/ffmpeg/lib/pkgconfig:$BUILD_DIR/qt/lib/pkgconfig" ./configure --disable-gui --prefix=
 make -j$(nproc) install
 
 #
@@ -206,20 +147,6 @@ echo "Compiling umask wrapper..."
 gcc -o "$BUILD_DIR"/umask_wrapper.so "$SCRIPT_DIR/umask_wrapper.c" -fPIC -shared
 echo "Installing umask wrapper..."
 cp -v "$BUILD_DIR"/umask_wrapper.so "$INSTALL_DIR/lib/"
-
-#
-# QT Plugins
-#
-echo "Adding QT platform plugins..."
-QT_PLUGINS="$BUILD_DIR/qt/plugins/platforms/libqxcb.so"
-mkdir "$INSTALL_DIR/lib/platforms"
-for lib in $QT_PLUGINS
-do
-    base_lib="$(basename $lib)"
-    echo "  -> QT Plugin: $lib"
-    cp "$lib" "$INSTALL_DIR/lib/"
-    ln -s ../$base_lib "$INSTALL_DIR/lib/platforms/$base_lib"
-done
 
 #
 # curl libraries
@@ -276,15 +203,5 @@ find "$INSTALL_DIR" \
     -type f \
     -name "lib*" \
     -exec echo "  -> Setting rpath of {}..." \; -exec patchelf --set-rpath '$ORIGIN' {} \;
-
-echo "Creating qt.conf..."
-echo "[Paths]"                 >  "$INSTALL_DIR/bin/qt.conf"
-echo "Prefix = $ROOT_EXEC_DIR" >> "$INSTALL_DIR/bin/qt.conf"
-echo "Plugins = lib"           >> "$INSTALL_DIR/bin/qt.conf"
-
-echo "Creating tarball..."
-tar -zcf "$TARBALL_DIR/makemkv.tar.gz" -C "$INSTALL_BASEDIR" "${ROOT_EXEC_DIR:1}" --owner=0 --group=0
-
-echo "$TARBALL_DIR/makemkv.tar.gz created successfully!"
 
 # vim:ft=sh:ts=4:sw=4:et:sts=4

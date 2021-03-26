@@ -43,11 +43,6 @@ jobs:
             sudo apt-get install -y cdemu-client linux-headers-$(uname -r)
             eval $(dbus-launch --sh-syntax |tee ~/.cdemu |tee -a ~/.bashrc)
             cdemu status
-      - run:
-          name: Build makemkv
-          command: |
-            cd makemkv-builder
-            ./run.sh
 
       - run:
           name: Build Dockerfile
