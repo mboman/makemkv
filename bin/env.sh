@@ -31,8 +31,8 @@ fi
 
 # Get disc label/UUID if not run through udev rule.
 if [ -n "$DEVNAME" ] && [ -b "$DEVNAME" ]; then
-    if [ -z "$ID_FS_LABEL" ]; then ID_FS_LABEL=$(blkid -o value -s LABEL "$DEVNAME" || true); fi
-    if [ -z "$ID_FS_UUID" ]; then ID_FS_UUID=$(blkid -o value -s UUID "$DEVNAME" || true); fi
+    if [ -z "$ID_FS_LABEL" ]; then ID_FS_LABEL=$(lsblk -n -o label "$DEVNAME" | sed s/[^A-Za-z0-9]/_/g || true); fi
+    if [ -z "$ID_FS_UUID" ]; then ID_FS_UUID=$(lsblk -n -o uuid "$DEVNAME" | sed s/[^A-Za-z0-9]/_/g || true); fi
 fi
 
 # Write debug statements to stderr.
@@ -58,7 +58,8 @@ on_err () {
     if [ -d "$DIR_FINAL" ]; then
         local -x _FAILED_FILE="$DIR_FINAL/failed"
         hook pre-on-err-touch
-        sudo -u mkv touch "$_FAILED_FILE"
+        touch "$_FAILED_FILE"
+        chown mkv:mkv "$_FAILED_FILE"
         hook post-on-err-touch
     fi
 
@@ -66,7 +67,7 @@ on_err () {
     if [ "$NO_EJECT" != "true" ] && [ "$FAILED_EJECT" == "true" ]; then
         hook pre-failed-eject
         echo "Ejecting due to failure..."
-        eject ${DEBUG:+--verbose} "$DEVNAME"
+        eject "$DEVNAME"
         hook post-failed-eject
     fi
 }
@@ -88,13 +89,12 @@ prepare () {
 
     # Set umask.
     umask "$UMASK"
-    EDITOR='tee -a' visudo <<< "Defaults umask = $UMASK"
 
     # Determine destination directory and set its permissions.
     DIR_FINAL=$(mktemp -d "/output/${ID_FS_LABEL:-nolabel}_${ID_FS_UUID:-nouuid}_XXX")
-    chown mkv:mkv "$DIR_FINAL"
     DIR_WORKING="$DIR_FINAL/.rip"
-    sudo -u mkv mkdir "$DIR_WORKING" && chmod $(stat -c %a "$_") "$DIR_FINAL"
+    mkdir -p "$DIR_WORKING" && chmod $(stat -c %a "$_") "$DIR_FINAL"
+    chown -R mkv:mkv "$DIR_FINAL"
 }
 
 # Kill makemkvcon when not enough disk space. It keeps going no matter what.
@@ -120,14 +120,15 @@ catch_failed () {
 # Run makemkvcon. In a function for job control in rip.sh. Function should always be run in the background.
 run_makemkvcon () {
     trap - ERR  # Disable error trap here to avoid firing error hooks twice.
-    sudo -u mkv LD_PRELOAD=/wrappers.so /opt/makemkvcon/bin/makemkvcon mkv ${DEBUG:+--debug} --progress -same --directio true \
+    LD_PRELOAD=/wrappers.so /opt/makemkv/bin/makemkvcon mkv ${DEBUG:+--debug} --progress -same --directio true \
         "dev:$DEVNAME" all "$DIR_WORKING" \
         |low_space_term \
         |catch_failed
+    chown -R mkv:mkv "$DIR_WORKING"
 }
 
 # Move media from incoming directory to movie directory.
 move_back () {
-    sudo -u mkv mv "$DIR_WORKING/"* "$DIR_FINAL/"
-    sudo -u mkv rmdir "$DIR_WORKING"
+    mv ${DEBUG:+--verbose} "$DIR_WORKING/"* "$DIR_FINAL/"
+    rmdir ${DEBUG:+--verbose} "$DIR_WORKING"
 }

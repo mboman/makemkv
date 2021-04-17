@@ -7,12 +7,12 @@ FROM alpine:latest
 MAINTAINER Michael Boman <michael@michaelboman.org>
 
 RUN apk --update-cache upgrade && \
-    apk add sudo && \
-    sudo adduser --disabled-password -s /sbin/nologin -G cdrom mkv && \
-    sudo -u mkv mkdir /home/mkv/.MakeMKV
+    apk add bash shadow lsblk sed coreutils && \
+    adduser --disabled-password -s /sbin/nologin -G cdrom mkv && \
+    addgroup mkv && \
+    addgroup mkv mkv && \
+    install -o mkv -g mkv -d /home/mkv/.MakeMKV
 
-#COPY --from=builder /output/makemkv.tar.gz /makemkv.tar.gz
-#RUN tar -x -p -C / /makemkv.tar.gz && rm -f /makemkv.tar.gz
 COPY --from=builder /tmp/makemkv-install/opt /opt
 
 VOLUME /output
