@@ -62,7 +62,7 @@ move_back
 if [ "$NO_EJECT" != "true" ]; then
     hook pre-success-eject
     echo "Ejecting..."
-    eject ${DEBUG:+--verbose} "$DEVNAME"
+    eject "$DEVNAME"
     hook post-success-eject
 fi
 
