@@ -3,7 +3,7 @@ MAINTAINER Michael Boman <michael@michaelboman.org>
 COPY makemkv-builder/builder /builder
 RUN /builder/build.sh /output
 
-FROM alpine:latest
+FROM alpine:3
 MAINTAINER Michael Boman <michael@michaelboman.org>
 
 RUN apk --update-cache upgrade && \
